@@ -1,7 +1,7 @@
 /target
 **/*.rs.bk
-Cargo.lock
-.DS_Store
+# Cargo.lock is committed for binary crates (helps reproducible builds)
+# .DS_Store
 *.wav
 *.silk
 *.mp3
