@@ -82,7 +82,7 @@ jobs:
       - name: Flatten artifacts
         run: |
           mkdir -p flat
-          find artifacts -type f \( -name '*.tar.gz' -o -name '*.zip' \) -exec cp {} flat/ \;
+          find artifacts -type f \( -name '*.tar.xz' -o -name '*.tar.gz' -o -name '*.zip' \) -exec cp {} flat/ \;
           ls -la flat/
 
       - name: Generate checksums
