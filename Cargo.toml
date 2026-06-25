@@ -1,6 +1,6 @@
 [package]
 name = "silk-convert"
-version = "0.3.0"
+version = "0.3.1"
 edition = "2021"
 description = "Convert WeChat SILK to MP3/WAV/Opus/AAC and back. Fast single binary, no Python deps."
 license = "Apache-2.0"
