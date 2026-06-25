@@ -1,5 +1,8 @@
 # silk
 
+[![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/0/badge)](https://bestpractices.coreinfrastructure.org/projects/0)
+[![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/ljh-sh/silk/badge)](https://scorecard.dev/viewer/?uri=github.com/ljh-sh/silk)
+
 > WeChat SILK audio converter. Single Rust binary, no Python deps.
 
 > 微信 SILK 音频转换器。单个 Rust 二进制，无 Python 依赖。
