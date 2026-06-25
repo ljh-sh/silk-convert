@@ -10,7 +10,7 @@ pub fn run(input: &Path) -> Result<()> {
 
     match fmt {
         AudioFormat::Wav => {
-            let reader = hound::WavReader::open(input)?;
+            let mut reader = hound::WavReader::open(input)?;
             let spec = reader.spec();
             let samples = reader.samples::<i16>().count();
             let duration = samples as f64 / spec.sample_rate as f64;
