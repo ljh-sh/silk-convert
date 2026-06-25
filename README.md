@@ -5,7 +5,7 @@
 
 > WeChat SILK audio converter. Single Rust binary, no Python deps.
 
-> 微信 SILK 音频转换器。单个 Rust 二进制，无 Python 依赖。
+> 微信 SILK 音频转换器。单个 Rust 二进制，无 Python 依赖。— [中文文档](README.cn.md)
 
 ## What is this
 
@@ -17,17 +17,6 @@ WeChat voice messages are encoded with the [SILK codec](https://en.wikipedia.org
 - **Batch processes** directories
 
 5 subcommands: `decode` / `encode` / `detect` / `info` / `batch`
-
-## 这是什么
-
-微信语音消息用 SILK codec 编码。本工具：
-
-- **解码** SILK → WAV
-- **编码** WAV → SILK
-- **识别** 音频格式（按 magic bytes）
-- **批量** 处理
-
-5 个子命令。
 
 ## Install
 
@@ -85,7 +74,7 @@ bitrate: ~13.3 kbps
 | Encode (back to silk) | ✅ | ❌ | ❌ | ✅ |
 | Batch | ✅ native | ❌ | ❌ | ❌ |
 | Magic-byte format detect | ✅ | ❌ (extension only) | ❌ | ❌ |
-| Dependencies | 6 pure-Rust crates | Python + ffmpeg | Python | Python |
+| Dependencies | 5 pure-Rust crates | Python + ffmpeg | Python | Python |
 | Cold-start per file | ~10ms | ~40-60ms | similar | similar |
 | License | Apache 2.0 | MIT | — | — |
 | Status | active | inactive | inactive | inactive |
@@ -127,7 +116,7 @@ time silk batch ./ -o ./out/ --to wav --pattern "*.silk"
 
 ## Security
 
-- 6 pure-Rust deps + 1 FFI (silk-codec) — auditable
+- 5 pure-Rust deps + 1 FFI (silk-codec) — auditable
 - No network calls, no telemetry, no auto-update
 - See [SECURITY.md](SECURITY.md) for full dependency audit
 
@@ -136,7 +125,7 @@ time silk batch ./ -o ./out/ --to wav --pattern "*.silk"
 | Version | Status | Features |
 |---------|--------|----------|
 | v0.2.x | ✅ | WAV + SILK + 5 subcmd, Apache 2.0, benchmark doc |
-| v0.3.0 | 🚧 | Repo rename, docs/, GitHub Pages |
+| v0.3.0 | ✅ | Repo rename, docs/, GitHub Pages |
 | v0.4.0 | 📋 | MP3/Opus/AAC/FLAC via symphonia |
 
 ## License
