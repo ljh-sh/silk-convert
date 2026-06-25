@@ -1,6 +1,6 @@
 [package]
 name = "silk-convert"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2021"
 description = "Convert WeChat SILK to MP3/WAV/Opus/AAC and back. Fast single binary, no Python deps."
 license = "MIT"
@@ -9,7 +9,7 @@ keywords = ["silk", "wechat", "audio", "converter", "codec"]
 categories = ["command-line-utilities", "multimedia", "codec"]
 
 [[bin]]
-name = "silk-convert"
+name = "silk"
 path = "src/main.rs"
 
 [dependencies]
@@ -18,9 +18,9 @@ anyhow = "1.0"
 hound = "3.5"
 walkdir = "2.5"
 indicatif = "0.17"
+silk-codec = "0.2"
 
 # v0.3.0 deps (require system libs / FFI):
-# silk-codec = "0.2"   # SILK encode/decode (needs libsilk)
 # symphonia = "0.5"    # MP3/Opus/AAC/FLAC decode
 # mp3lame-encoder = "0.2"  # MP3 encode (needs libmp3lame)
 

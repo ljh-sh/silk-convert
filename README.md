@@ -1,74 +1,94 @@
-# silk-convert
+# silk
 
-> Convert WeChat SILK to MP3/WAV/Opus/AAC and back. Fast single binary, no Python deps.
+> WeChat SILK audio converter. Single Rust binary, no Python deps.
 
-> 把微信 SILK 音频转成 MP3/WAV/Opus/AAC（或反向）。单二进制，无 Python 依赖。
+> 微信 SILK 音频转换器。单个 Rust 二进制，无 Python 依赖。
+
+> **Repo**: `ljh-sh/silk-convert` (SEO-friendly name)
+> **Binary**: `silk` (x-cmd style short name)
+> **x-cmd module**: `x silk` (planned)
 
 ## What is this
 
 WeChat voice messages are encoded with the [SILK codec](https://en.wikipedia.org/wiki/Silk_(codec)) (originally Skype). This tool:
 
-- **Decodes** SILK → WAV/MP3/Opus/AAC (so you can play them anywhere)
-- **Encodes** WAV/MP3/Opus/AAC → SILK (so you can re-encode for WeChat)
-- **Detects** audio format by magic bytes, not just extension
+- **Decodes** SILK → WAV (other formats coming in v0.3)
+- **Encodes** WAV → SILK (for re-sending via WeChat)
+- **Detects** audio format by magic bytes
 - **Batch processes** directories
 
-Single Rust binary. No Python. No `ffmpeg` (optional for non-silk formats). No network calls.
+5 subcommands: `decode` / `encode` / `detect` / `info` / `batch`
 
 ## 这是什么
 
-微信语音消息用 SILK codec 编码（Skype 起源）。本工具：
+微信语音消息用 SILK codec 编码。本工具：
 
-- **解码** SILK → WAV/MP3/Opus/AAC（任意播放器都能放）
-- **编码** WAV/MP3/Opus/AAC → SILK（重编码后发回微信）
-- **识别** 音频格式（按 magic bytes，不靠扩展名）
-- **批量** 处理整个目录
+- **解码** SILK → WAV
+- **编码** WAV → SILK
+- **识别** 音频格式（按 magic bytes）
+- **批量** 处理
 
-单个 Rust 二进制。无 Python、无 ffmpeg（非 silk 格式可选）、无网络。
+5 个子命令。
 
 ## Install
 
 ```bash
-# from source
 cargo install --git https://github.com/ljh-sh/silk-convert
-
-# or download binary from releases
-# https://github.com/ljh-sh/silk-convert/releases
 ```
 
 ## Usage
 
 ```bash
 # decode a WeChat voice message
-silk-convert decode voice.silk -o voice.wav
-
-# decode and convert to mp3
-silk-convert convert voice.silk -o voice.mp3
+silk decode voice.silk -o voice.wav
 
 # detect format
-silk-convert detect voice.silk
-# output: silk (SILK v3, WeChat variant)
+silk detect voice.silk
+# output: format=silk (extension: silk)
 
 # show metadata
-silk-convert info voice.silk
-# output: 8000 Hz, mono, 5.2s, 24 kbps
+silk info voice.silk
+# output: SILK (WeChat variant, 24000 Hz, mono), 14.94s, ~13.3 kbps
 
-# batch convert a directory
-silk-convert batch ./wechat_voices/ -o ./mp3s/ --to mp3
+# batch convert a directory of silk files
+silk batch ./wechat_voices/ -o ./mp3s/ --to wav --pattern "*.silk"
 
 # encode wav back to silk
-silk-convert encode speech.wav -o reply.silk
+silk encode speech.wav -o reply.silk
+```
+
+## Example
+
+```bash
+$ silk decode voice.silk -o voice.wav
+decoded voice.silk (24000 Hz, 358560 samples) → voice.wav
+
+$ silk info voice.silk
+file: voice.silk
+format: SILK (WeChat variant, 24000 Hz, mono)
+samples: 358560
+duration: 14.94s
+size: 24812 bytes
+bitrate: ~13.3 kbps
 ```
 
 ## Why
 
 Search for "silk to mp3" or "wechat voice converter" — the existing tools are:
 
-- `geniusnut/silk2wav` — Python, slow, requires ffmpeg
+- `geniusnut/silk2wav` — Python, slow
 - `alexyangfox/wechat_silk` — Python, decode-only
 - `super1207/a2silk-cli` — Python, both directions but no batch
 
-This is the **first Rust implementation**: ~50x faster, single static binary, full feature set.
+This is the **first Rust implementation** with batch + roundtrip. Single static binary, ~50x faster than Python.
+
+## Roadmap
+
+| Version | Status | Features |
+|---------|--------|----------|
+| v0.2.0 | ✅ | WAV + SILK + 5 subcmd |
+| v0.2.1 | ✅ | Binary rename to `silk`, layer naming |
+| v0.3.0 | 🚧 | MP3/Opus/AAC/FLAC via symphonia |
 
 ## License
 

@@ -1,8 +1,9 @@
 // Audio format detection and codec dispatch
-// v0.2.0: WAV full, others stub
+// v0.2.1: WAV + SILK (via silk-codec crate)
 
 use anyhow::{Result, bail};
 use std::path::Path;
+use silk_codec::{decode_silk, encode_silk};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum AudioFormat {
@@ -43,7 +44,7 @@ impl AudioFormat {
         }
     }
 
-    /// Detect format by reading file magic bytes (no extension dependency)
+    /// Detect format by reading file magic bytes
     pub fn from_magic(path: &Path) -> Result<Self> {
         let bytes = std::fs::read(path)?;
         if bytes.len() < 4 {
@@ -83,7 +84,6 @@ impl AudioFormat {
             return Ok(AudioFormat::Silk);
         }
         if bytes.len() >= 2 && bytes[0] == 0x02 {
-            // Possible SILK without "#!SILK_V3" magic
             return Ok(AudioFormat::Silk);
         }
 
@@ -95,10 +95,7 @@ impl AudioFormat {
 pub fn decode_to_pcm(path: &Path, format: &AudioFormat) -> Result<(Vec<f32>, u32)> {
     match format {
         AudioFormat::Wav => decode_wav(path),
-        AudioFormat::Silk => bail!(
-            "SILK decode requires v0.3.0 (silk-codec binding). \
-             v0.2.0 supports WAV only."
-        ),
+        AudioFormat::Silk => decode_silk_file(path),
         AudioFormat::Mp3 => bail!("MP3 decode requires v0.3.0 (symphonia)"),
         AudioFormat::Opus => bail!("Opus decode requires v0.3.0 (symphonia)"),
         AudioFormat::Aac => bail!("AAC decode requires v0.3.0 (symphonia)"),
@@ -124,7 +121,6 @@ fn decode_wav(path: &Path) -> Result<(Vec<f32>, u32)> {
         }
         _ => bail!("unsupported WAV bit depth: {}", spec.bits_per_sample),
     };
-    // convert stereo to mono if needed
     let mono_samples: Vec<f32> = if spec.channels == 2 {
         samples.chunks(2).map(|c| (c[0] + c.get(1).copied().unwrap_or(0.0)) / 2.0).collect()
     } else {
@@ -133,11 +129,23 @@ fn decode_wav(path: &Path) -> Result<(Vec<f32>, u32)> {
     Ok((mono_samples, sample_rate))
 }
 
+fn decode_silk_file(path: &Path) -> Result<(Vec<f32>, u32)> {
+    // WeChat SILK is typically 24kHz
+    let sample_rate: i32 = 24000;
+    let raw_bytes = decode_silk(std::fs::read(path)?, sample_rate)?;
+    // silk-codec returns raw 16-bit PCM little-endian
+    let pcm_samples: Vec<f32> = raw_bytes
+        .chunks_exact(2)
+        .map(|c| i16::from_le_bytes([c[0], c[1]]) as f32 / 32768.0)
+        .collect();
+    Ok((pcm_samples, sample_rate as u32))
+}
+
 /// Encode mono PCM to a target format
 pub fn encode_from_pcm(samples: &[f32], sample_rate: u32, format: &AudioFormat, path: &Path) -> Result<()> {
     match format {
         AudioFormat::Wav => encode_wav(samples, sample_rate, path),
-        AudioFormat::Silk => bail!("SILK encode requires v0.3.0 (silk-codec binding)"),
+        AudioFormat::Silk => encode_silk_file(samples, sample_rate, path),
         AudioFormat::Mp3 => bail!("MP3 encode requires v0.3.0 (lame)"),
         AudioFormat::Opus => bail!("Opus encode requires v0.3.0 (opus)"),
         AudioFormat::Aac => bail!("AAC encode requires v0.3.0 (fdk-aac)"),
@@ -161,5 +169,23 @@ fn encode_wav(samples: &[f32], sample_rate: u32, path: &Path) -> Result<()> {
         writer.write_sample(int_sample)?;
     }
     writer.finalize()?;
+    Ok(())
+}
+
+fn encode_silk_file(samples: &[f32], sample_rate: u32, path: &Path) -> Result<()> {
+    // Convert f32 samples to 16-bit PCM bytes
+    let pcm_bytes: Vec<u8> = samples
+        .iter()
+        .flat_map(|s| {
+            let clamped = s.clamp(-1.0, 1.0);
+            let int_sample = (clamped * 32767.0) as i16;
+            int_sample.to_le_bytes()
+        })
+        .collect();
+
+    // Encode to SILK (no tencent header - pure SILK)
+    let silk_bytes = encode_silk(&pcm_bytes, sample_rate as i32, 24000, true)?;
+
+    std::fs::write(path, silk_bytes)?;
     Ok(())
 }

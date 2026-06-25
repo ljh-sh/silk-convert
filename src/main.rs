@@ -6,8 +6,8 @@ mod codec;
 mod subcmd;
 
 #[derive(Parser)]
-#[command(name = "silk-convert")]
-#[command(version, about = "Convert WeChat SILK to MP3/WAV/Opus/AAC and back")]
+#[command(name = "silk")]
+#[command(version, about = "Convert WeChat SILK to MP3/WAV/Opus/AAC and back", long_about = None)]
 struct Cli {
     #[command(subcommand)]
     command: Command,
@@ -24,23 +24,14 @@ enum Command {
         #[arg(long, default_value = "wav")]
         to: String,
     },
-    /// Encode WAV/MP3/Opus → SILK
+    /// Encode WAV → SILK
     Encode {
         input: PathBuf,
         #[arg(short, long)]
         output: Option<PathBuf>,
-        /// SILK sample rate (8000 or 16000 / 24000)
+        /// SILK sample rate (8000/12000/16000/24000)
         #[arg(long, default_value = "24000")]
         sample_rate: u32,
-    },
-    /// Convert between audio formats (auto-detect)
-    Convert {
-        input: PathBuf,
-        #[arg(short, long)]
-        output: Option<PathBuf>,
-        /// Target format (wav, mp3, opus, aac, silk, ogg, flac)
-        #[arg(long)]
-        to: String,
     },
     /// Detect audio format
     Detect {
@@ -55,8 +46,8 @@ enum Command {
         input_dir: PathBuf,
         #[arg(short, long)]
         output: Option<PathBuf>,
-        /// Target format
-        #[arg(long)]
+        /// Target format (wav)
+        #[arg(long, default_value = "wav")]
         to: String,
         /// File pattern (glob)
         #[arg(long, default_value = "*")]
@@ -73,9 +64,6 @@ fn main() -> Result<()> {
         }
         Command::Encode { input, output, sample_rate } => {
             subcmd::encode::run(&input, output.as_deref(), sample_rate)?;
-        }
-        Command::Convert { input, output, to } => {
-            subcmd::convert::run(&input, output.as_deref(), &to)?;
         }
         Command::Detect { input } => {
             subcmd::detect::run(&input)?;
