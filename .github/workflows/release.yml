@@ -22,6 +22,9 @@ jobs:
           - target: x86_64-apple-darwin
             os: macos-latest
             binary: silk
+          - target: aarch64-unknown-linux-gnu
+            os: ubuntu-latest
+            binary: silk
           - target: x86_64-unknown-linux-gnu
             os: ubuntu-latest
             binary: silk
@@ -54,9 +57,11 @@ jobs:
 
       - name: Package (Windows)
         if: runner.os == 'Windows'
-        shell: pwsh
         run: |
-          Compress-Archive -Path target/${{ matrix.target }}/release/${{ matrix.binary }} -DestinationPath silk-${{ github.ref_name }}-${{ matrix.target }}.zip
+          mkdir -p staging
+          cp target/${{ matrix.target }}/release/${{ matrix.binary }} staging/
+          tar -C staging -cJf silk-${{ github.ref_name }}-${{ matrix.target }}.tar.xz ${{ matrix.binary }}
+          rm -rf staging
 
       - name: Upload artifact
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -64,7 +69,6 @@ jobs:
           name: silk-${{ matrix.target }}
           path: |
             silk-${{ github.ref_name }}-${{ matrix.target }}.tar.xz
-            silk-${{ github.ref_name }}-${{ matrix.target }}.zip
 
   release:
     name: Release
