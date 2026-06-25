@@ -79,13 +79,16 @@ jobs:
         with:
           path: artifacts
 
-      - name: List artifacts
-        run: ls -la artifacts/
+      - name: Flatten artifacts
+        run: |
+          mkdir -p flat
+          find artifacts -type f \( -name '*.tar.gz' -o -name '*.zip' \) -exec cp {} flat/ \;
+          ls -la flat/
 
       - name: Generate checksums
-        working-directory: artifacts
+        working-directory: flat
         run: |
-          find . -type f \( -name '*.tar.gz' -o -name '*.zip' \) -exec sha256sum {} \; > SHA256SUMS
+          sha256sum silk-* > SHA256SUMS
           cat SHA256SUMS
 
       - name: Create GitHub release
@@ -95,5 +98,5 @@ jobs:
           draft: true
           generate_release_notes: true
           files: |
-            artifacts/silk-*
-            artifacts/SHA256SUMS
+            flat/silk-*
+            flat/SHA256SUMS
