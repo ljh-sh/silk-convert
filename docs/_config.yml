@@ -1,0 +1,24 @@
+title: silk
+description: WeChat SILK audio converter. Single Rust binary, no Python deps.
+baseurl: "/silk"
+url: "https://ljh-sh.github.io"
+
+permalink: pretty
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
+
+plugins:
+  - jekyll-relative-links
+  - jekyll-sitemap
+
+relative_links:
+  enabled: true
+  collections: true
+
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
