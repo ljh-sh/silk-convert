@@ -53,8 +53,11 @@ sha256sum target/release/silk
 
 ## Reporting a vulnerability
 
-Open a GitHub issue with label `security` (private disclosure preferred via
-GitHub Security Advisories).
+For private disclosure, please email [security@x-cmd.com](mailto:security@x-cmd.com)
+(alias routes to `it@x-cmd.com`, monitored by the x-cmd maintainer).
+
+You may also open a GitHub issue with label `security`; private disclosure
+via GitHub Security Advisories is preferred for sensitive reports.
 
 ## What we will NOT do
 
