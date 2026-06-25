@@ -1,0 +1,11 @@
+/target
+**/*.rs.bk
+Cargo.lock
+.DS_Store
+*.wav
+*.silk
+*.mp3
+*.opus
+*.aac
+*.ogg
+*.flac
